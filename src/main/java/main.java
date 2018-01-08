@@ -1,4 +1,7 @@
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 
 public class main {
 
@@ -136,15 +139,160 @@ public class main {
             counter.increment();
             System.out.printf("binary counter=%s\n", counter.toString());
         }*/
-        
+
+        /*
         BTree tree = new BTree();
         System.out.printf("Root - %s\n", tree.root.toString());
-        for (int i = 1; i < 11; ++i) {
+        for (int i = 1; i < 100; ++i) {
             tree.insert(i);
         }
 
         System.out.printf("Root - %s\n", tree.root.toString());
         tree.traverse_bfs();
+        tree.dfs();
         tree.resetCounters();
+
+        BTree.Node cur = tree.search(77);
+        System.out.printf("search(%d) - %s\n", 77, cur == null ? "not found" : cur.toString());
+
+        tree.delete(90);
+        tree.traverse_bfs();
+        tree.dfs();
+        tree.delete(76);
+        tree.traverse_bfs();
+        tree.dfs();
+        */
+
+
+        FHeap heap = new FHeap();
+        for (int i = 1; i <= 10; ++i) {
+            heap.insert(i, null);
+        }
+        for (int i = 1; i <= 10; ++i) {
+            System.out.printf("FHeap min=%d\n", heap.extractMin().value);
+        }
+
+        /*
+        DisjointSet [] sets = new DisjointSet[16];
+        for (int i = 0; i < sets.length; ++i) {
+            sets[i] = new DisjointSet(i);
+            System.out.printf("set[%d] = %s\n", i, sets[i].toString());
+        }
+        for (int i = 0; i < sets.length - 1; i = i + 2) {
+            DisjointSet.union(sets[i], sets[i+1]);
+        }
+
+        for (int i = 0; i < sets.length; ++i) {
+            System.out.printf("find-set-1[%d] = %s\n", i, sets[i].findset().toString());
+        }
+        for (int i = 0; i < sets.length - 4; i = i + 4) {
+            DisjointSet.union(sets[i], sets[i+2]);
+        }
+        for (int i = 0; i < sets.length; ++i) {
+            System.out.printf("find-set-2[%d] = %s\n", i, sets[i].findset().toString());
+        }
+        DisjointSet.union(sets[0], sets[4]);
+        DisjointSet.union(sets[10], sets[12]);
+        DisjointSet.union(sets[0], sets[9]);
+        for (int i = 0; i < sets.length; ++i) {
+            System.out.printf("find-set-3[%d] = %s\n", i, sets[i].findset().toString());
+        }
+
+        DisjointSet set1 = new DisjointSet(1);
+        DisjointSet set2 = new DisjointSet(2);
+        DisjointSet set3 = new DisjointSet(3);
+        DisjointSet set4 = new DisjointSet(4);
+        DisjointSet set5 = new DisjointSet(5);
+        DisjointSet.union(set1,set2);
+        DisjointSet.union(set3,set4);
+        DisjointSet.union(set1,set3);
+        DisjointSet.union(set5, set1);
+        System.out.printf("find-set1= %s\n", set4.findset().toString());
+        */
+
+        /*
+        String[] items = {"undershorts", "pants", "shoes", "socks", "watch", "belt", "shirt", "tie", "jacket"};
+        int[] edge1 = {0,0,3,1,6,6,7,5,1};
+        int[] edge2 = {1,2,2,5,5,7,8,8,2};
+
+        Graph graph = new Graph(items, edge1, edge2);
+        graph.printGraph();
+        graph.sort();
+        */
+
+        /*
+        String[] vertices = {"a","b","c","d","e","f","g","h","i"};
+        List<Edge> edges = new ArrayList<Edge>();
+        edges.add(new Edge(0,1,4));
+        edges.add(new Edge(0,7,8));
+        edges.add(new Edge(1,2,8));
+        edges.add(new Edge(1,7,11));
+        edges.add(new Edge(2,3,7));
+        edges.add(new Edge(2,8,2));
+        edges.add(new Edge(2,5,4));
+        edges.add(new Edge(3,4,9));
+        edges.add(new Edge(3,5,14));
+        edges.add(new Edge(4,5,10));
+        edges.add(new Edge(5,6,2));
+        edges.add(new Edge(6,7,1));
+        edges.add(new Edge(6,8,6));
+        edges.add(new Edge(7,8,7));
+        Kruskal k = new Kruskal(vertices, edges);
+        Prim p = new Prim(vertices, edges);
+        k.minimumSpanningTree();
+        p.minimumSpanningTree();
+        */
+        /*
+        String[] vertices = {"s","t","x","y","z"};
+        List<Edge> edges = new ArrayList<Edge>();
+        edges.add(new Edge(0,1,10));
+        edges.add(new Edge(0,3,5));
+        edges.add(new Edge(1,2,1));
+        edges.add(new Edge(1,3,2));
+        edges.add(new Edge(2,4,4));
+        edges.add(new Edge(3,1,3));
+        edges.add(new Edge(3,2,9));
+        edges.add(new Edge(3,4,2));
+        edges.add(new Edge(4,2,6));
+        edges.add(new Edge(4,0,7));
+        Dijkstra d = new Dijkstra(vertices, edges);
+        d.singleSourceShortestPath(1);
+
+        */
+        /*
+        Integer[] test = {3,4,5,7,3,7,8,1,3,4,7,8,4,6,8,8,10,43,6,374,345,652,7342,};
+        Arrays.sort(test, new Comparator<Integer>() {
+            public int compare(Integer o1, Integer o2) {
+                return o1 - o2;
+            }
+        });
+        Integer[] test2 = new Integer[10];
+        System.arraycopy(test, 0, test2, 0, test2.length);
+        System.out.println(Arrays.toString(test2));
+        */
+        String in = " The quick  brown fox    jumped over the fence";
+        System.out.println(reverseWords(in));
+    }
+
+    public static String reverseWords(String input) {
+        String out;
+        StringBuffer buffer = new StringBuffer();
+
+        char[] in = input.toCharArray();
+        int wend = in.length - 1;
+
+        for (int i = in.length - 1; i >= 0; --i) {
+            if (in[i] == ' ') {
+                buffer.append(in, i+1, wend - i);
+                if (in[wend] != ' ') {
+                    buffer.append(in[i]);
+                }
+                wend = i;
+            }
+        }
+        buffer.append(in, 0, wend);
+
+        out = buffer.toString();
+        return out;
     }
 }

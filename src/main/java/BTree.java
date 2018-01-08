@@ -13,7 +13,7 @@ public class BTree {
         public Node(boolean leaf) {
             isLeaf = leaf;
             values = new int[(2*t) - 1];
-            nodes = new Node[(2*t) - 1];
+            nodes = new Node[2*t];
             for (Node n : nodes) {
                 n = null;
             }
@@ -33,7 +33,33 @@ public class BTree {
             }
             values[num++] = cur;
         }
-        
+
+        public boolean contains(int n) {
+            for (int value : values) {
+                if (value == n) return true;
+            }
+            return false;
+        }
+
+        public void remove(int n) {
+            int i = 0;
+            while (i < num && values[i] != n) {
+                ++i;
+            }
+            while (i < num - 1) {
+                values[i] = values[i + 1];
+                ++i;
+            }
+            --num;
+        }
+
+        public Node getChild(int n) {
+            for (int i = 0; i < num; ++i) {
+                if (n < values[i]) return nodes[i];
+            }
+            return nodes[num];
+        }
+
         public void setChild(Node child, int pos) {
             nodes[pos] = child;
         }
@@ -45,7 +71,14 @@ public class BTree {
             }
             nodes[pos] = child;
         }
-        
+
+        public void removeChild(int pos) {
+            // shift all child nodes from this pos to the left
+            for (int i = pos; i < nodes.length - 1; ++i) {
+                nodes[i] = nodes[i+1];
+            }
+        }
+
         public String toString() {
             String out = "Node: isLeaf(" + isLeaf + "), num(" + num + "), values=";
             for (int i = 0; i < num; ++i) {
@@ -96,11 +129,12 @@ public class BTree {
         Node right = new Node(split.isLeaf);
         for (int i = 0; i < t-1; ++i) {
             left.insertValue(split.values[i]);
-            left.insertChild(split.nodes[i], 0);
+            left.setChild(split.nodes[i], i);
         }
-        for (int i = t; i < split.num; ++ i) {
-            right.insertValue(split.values[i]);
-            right.insertChild(split.nodes[i], 0);
+        left.setChild(split.nodes[left.num], left.num);
+        for (int i = t; i <= split.num; ++ i) {
+            if (i < split.num) right.insertValue(split.values[i]);
+            right.insertChild(split.nodes[i], i-t);
         }
         node.setChild(right, pos);
         node.insertChild(left, pos);
@@ -116,24 +150,83 @@ public class BTree {
             return;
         }
         int i = 0;
-        while (i < node.num && n < node.values[i]) {
+        while (i < node.num && n > node.values[i]) {
             ++i;
         }
         if (node.nodes[i].num == (2*t) - 1) {
             splitChild(node, i);
-        }
-        if (n > node.values[i]) {
-            ++i;
+            if (n > node.values[i]) {
+                ++i;
+            }
         }
         insertNonFull(node.nodes[i], n);
     }
     
     public Node search(int n) {
-        return null;
-    
-        
+        Node cur = root;
+        while (cur != null) {
+            if (cur.contains(n)) return cur;
+            cur = cur.getChild(n);
+        }
+        return cur;
     }
-    
+
+    public void delete(int n) {
+        innerDelete(root, n);
+    }
+
+    public void innerDelete(Node node, int n) {
+        // case 1
+        if (node.isLeaf) {
+            node.remove(n);
+            return;
+        }
+        // case 2
+        if (node.contains(n)) {
+            Node left;
+            Node right;
+            int i = 0;
+            while (i < node.num && node.values[i] != n) {
+                ++i;
+            }
+            left = node.nodes[i];
+            right = node.nodes[i+1];
+            if (left.num >= t) {
+                node.values[i] = left.values[left.num-1];
+                innerDelete(left, node.values[i]);
+            } else if (right.num >= t) {
+                node.values[i] = right.values[right.num-1];
+                innerDelete(right, node.values[i]);
+            } else {
+                Node merged = new Node(left.isLeaf);
+                merged.num = left.num + right.num + 1;
+                for (int j = 0; j < left.num; ++j) {
+                    merged.values[j] = left.values[j];
+                    merged.nodes[j] = left.nodes[j];
+                }
+                merged.nodes[left.num] = left.nodes[left.num];
+                merged.values[left.num] = n;
+                for (int j = 0; j < right.num; ++j) {
+                    merged.values[j + left.num + 1] = right.values[j];
+                    merged.nodes[j + left.num + 1] = right.nodes[j];
+                }
+                merged.nodes[merged.num] = right.nodes[right.num];
+                node.remove(n);
+                node.removeChild(i);
+                node.setChild(merged, i);
+                innerDelete(merged, n);
+            }
+        } else {
+            // case 3
+            // determine child node
+            int i = 0;
+            while (i < node.num && node.values[i] < n) {
+                ++i;
+            }
+            innerDelete(node.nodes[i], n);
+        }
+    }
+
     public void traverse_bfs() {
         System.out.println("traverse_bfs");
         Queue<Node> queue = new LinkedList<Node>();
@@ -149,4 +242,17 @@ public class BTree {
         }
     }
 
+    public void dfs() {
+        System.out.println("traverse_dfs");
+        inner_dfs(root);
+    }
+
+    public void inner_dfs(Node node) {
+        if (node == null) return;
+        for (int i = 0; i < node.num; ++i) {
+            inner_dfs(node.nodes[i]);
+            System.out.printf("%d ", node.values[i]);
+        }
+        inner_dfs(node.nodes[node.num]);
+    }
 }
